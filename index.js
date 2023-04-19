@@ -28,9 +28,4 @@ app.use(cors());
 
 app.use("/", authRoute);
 
-
-app.get("/", (req, res) => {
-    res.status(200).json({ message: "Test route" });
-});
-
 app.listen(PORT, () => console.log(`app is live at port ${PORT}`));
