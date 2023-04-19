@@ -26,7 +26,7 @@ exports.signIn = async (req, res) => {
                 return res.status(400).json({ error: "Password is incorrect" });
             }
         } else {
-            return res.status(400).json({ message: "User does not exist" });
+            return res.status(400).json({ error: "User does not exist" });
         }
     } catch (error) {
         return res.status(400).json({ error: "Failed to sign in" });
@@ -52,7 +52,7 @@ exports.signUp = async (req, res) => {
             return res.status(400).json({ error: "Email already registered" });
         }
         if (phoneExists) {
-            return res.status(400).json({ message: "Phone number already registered" });
+            return res.status(400).json({ error: "Phone number already registered" });
         }
 
         const user = new User(req.body);
