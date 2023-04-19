@@ -1,5 +1,4 @@
 const { validationResult } = require("express-validator");
-
 const User = require("../models/user");
 
 exports.signIn = async (req, res) => {
@@ -45,16 +44,20 @@ exports.signUp = async (req, res) => {
             });
         }
 
-        const { email } = req.body;
-        const userExists = await User.findOne({ email }).exec();
+        const { email, phone } = req.body;
+        const emailExists = await User.findOne({ email }, 'email -_id').exec();
+        const phoneExists = await User.findOne({ phone }, 'phone -_id').exec();
 
-        if (userExists) {
-            return res.status(200).json({ message: "User already exists" });
-        } else {
-            const user = new User(req.body);
-            await user.save();
-            return res.status(200).json({ message: "Sign up successful" });
+        if (emailExists) {
+            return res.status(400).json({ error: "Email already registered" });
         }
+        if (phoneExists) {
+            return res.status(400).json({ message: "Phone number already registered" });
+        }
+
+        const user = new User(req.body);
+        await user.save();
+        return res.status(200).json({ message: "Sign up successful" });
     } catch (error) {
         return res.status(400).json({ error: "Failed to sign up" });
     }
