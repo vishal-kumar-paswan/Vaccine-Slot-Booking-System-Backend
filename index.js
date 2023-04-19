@@ -16,7 +16,7 @@ const cluster = process.env.CLUSTER;
 const dbURL = `mongodb+srv://${admin}:${password}@${cluster}/?retryWrites=true&w=majority`;
 
 // Database connection
-mongoose.connect(process.env.MONGODB_URI, {
+mongoose.connect(dbURL, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
 }).then(() => {
@@ -26,6 +26,6 @@ mongoose.connect(process.env.MONGODB_URI, {
 app.use(bodyParser.json());
 app.use(cors());
 
-app.use("/", authRoute);
+app.use(authRoute);
 
 app.listen(PORT, () => console.log(`app is live at port ${PORT}`));
