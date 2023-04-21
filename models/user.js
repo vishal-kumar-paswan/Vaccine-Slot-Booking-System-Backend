@@ -30,7 +30,7 @@ const userSchema = new mongoose.Schema({
         required: true,
         trim: true,
     },
-    bookings: {
+    appointments: {
         type: Array,
         default: []
     }
