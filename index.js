@@ -17,7 +17,7 @@ const cluster = process.env.CLUSTER;
 const dbURL = `mongodb+srv://${admin}:${password}@${cluster}/?retryWrites=true&w=majority`;
 
 // Database connection
-mongoose.connect(dbURL, {
+mongoose.connect(process.env.MONGODB_URI, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
 }).then(() => {
