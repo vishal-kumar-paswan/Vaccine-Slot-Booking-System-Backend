@@ -36,4 +36,11 @@ const userSchema = new mongoose.Schema({
     }
 }, { timestamps: true });
 
+// Defining userSchema methods
+userSchema.methods = {
+    authenticate: function (plainPassword) {
+        return plainPassword === this.password
+    },
+};
+
 module.exports = mongoose.model("User", userSchema);

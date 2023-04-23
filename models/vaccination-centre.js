@@ -59,4 +59,12 @@ const vaccinationCentreSchema = new mongoose.Schema({
     }
 }, { timestamps: true });
 
+// Defining userSchema methods
+vaccinationCentreSchema.methods = {
+    // authenticate while signing in
+    authenticate: function (plainPassword) {
+        return plainPassword === this.password
+    }
+};
+
 module.exports = mongoose.model("VaccinationCentre", vaccinationCentreSchema);
