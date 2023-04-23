@@ -7,7 +7,8 @@ const cors = require("cors");
 const PORT = process.env.PORT || 8000;
 
 // Importing routes
-const authRoute = require("./routes/auth");
+const userRoute = require("./routes/user");
+const vaccinationCentreRoute = require("./routes/vaccination-centre");
 
 
 const admin = encodeURIComponent(process.env.ADMIN);
@@ -16,16 +17,18 @@ const cluster = process.env.CLUSTER;
 const dbURL = `mongodb+srv://${admin}:${password}@${cluster}/?retryWrites=true&w=majority`;
 
 // Database connection
-mongoose.connect(process.env.MONGODB_URI, {
+mongoose.connect(dbURL, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
 }).then(() => {
     console.log("DATABASE CONNECTED");
 }).catch((error) => { console.log("FAILED TO CONNECT TO DATABASE", error); });
 
-app.use(bodyParser.json());
+// Using cors and body-parser
 app.use(cors());
+app.use(bodyParser.json());
 
-app.use(authRoute);
+app.use(userRoute);
+app.use(vaccinationCentreRoute);
 
 app.listen(PORT, () => console.log(`app is live at port ${PORT}`));
