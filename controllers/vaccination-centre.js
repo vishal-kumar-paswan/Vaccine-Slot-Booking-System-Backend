@@ -79,31 +79,30 @@ exports.loginToVaccinationCentre = async (req, res) => {
         const vaccinationCentre = await VaccinationCentre.findOne({ email })
             .populate('vaccines', '-_id -createdAt -updatedAt -__v');
 
-        if (vaccinationCentre != null) {
-            const { password: userPassword } = vaccinationCentre;
-            if (userPassword === password) {
-                const { _id, centre_name, email, phone, address, pin_code, district, state, vaccines, paid } = vaccinationCentre;
-                const { vaccine, stock } = vaccinationCentre.vaccines;
-                let vaccineData = {};
-                vaccine.map((item, index) => vaccineData[item] = stock[index]);
+        if (!vaccinationCentre) {
+            return res.status(400).json({ error: "Vaccination centre does not exists" });
+        }
 
-                return res.status(200).json({
-                    _id: _id,
-                    centre_name: centre_name,
-                    email, email,
-                    phone: phone,
-                    address, address,
-                    pin_code: pin_code,
-                    district: district,
-                    state: state,
-                    vaccines: vaccineData,
-                    paid: paid
-                });
-            } else {
-                return res.status(400).json({ error: "Password is incorrect" });
-            }
+        if (vaccinationCentre.authenticate(password)) {
+            const { _id, centre_name, email, phone, address, pin_code, district, state, paid } = vaccinationCentre;
+            const { vaccine, stock } = vaccinationCentre.vaccines;
+            let vaccineData = {};
+            vaccine.map((item, index) => vaccineData[item] = stock[index]);
+
+            return res.status(200).json({
+                _id: _id,
+                centre_name: centre_name,
+                email, email,
+                phone: phone,
+                address, address,
+                pin_code: pin_code,
+                district: district,
+                state: state,
+                vaccines: vaccineData,
+                paid: paid
+            });
         } else {
-            return res.status(400).json({ error: "Vaccination centre does not exist" });
+            return res.status(400).json({ error: "Password is incorrect" });
         }
     } catch (error) {
         return res.status(400).json({ error: error });

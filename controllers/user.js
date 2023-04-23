@@ -56,23 +56,22 @@ exports.signin = async (req, res) => {
         const { email, password } = req.body;
         const user = await User.findOne({ email }).exec();
 
-        if (user != null) {
-            const { password: userPassword } = user;
-            if (userPassword === password) {
-                const { _id, name, email, phone, address, appointments } = user;
-                return res.status(200).json({
-                    id: _id,
-                    name: name,
-                    email, email,
-                    phone: phone,
-                    address, address,
-                    appointments: appointments
-                });
-            } else {
-                return res.status(400).json({ error: "Password is incorrect" });
-            }
-        } else {
+        if (!user) {
             return res.status(400).json({ error: "User does not exist" });
+        }
+
+        if (user.authenticate(password)) {
+            const { _id, name, email, phone, address, appointments } = user;
+            return res.status(200).json({
+                id: _id,
+                name: name,
+                email, email,
+                phone: phone,
+                address, address,
+                appointments: appointments
+            });
+        } else {
+            return res.status(400).json({ error: "Password is incorrect" });
         }
     } catch (error) {
         return res.status(400).json({ error: error });
