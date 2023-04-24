@@ -365,7 +365,7 @@ exports.updateStock = async (req, res) => {
         const index1 = vaccine.indexOf(name);
         const index2 = vaccine.lastIndexOf(name);
 
-        if (index1 == index2) {
+        if (index1 == index2 && isPaid[index1] == paid) {
             console.log("SAME INDEX GETTING EXECUTED");
             stock[index1] += count;
         } else if (isPaid[index1] == paid) {
@@ -373,6 +373,8 @@ exports.updateStock = async (req, res) => {
         } else if (isPaid[index2] == paid) {
             stock[index2] += count;
 
+        } else {
+            return res.status(400).json({ error: `${paid ? "paid" : "free"} version of ${name} does not exists in database` });
         }
 
         existingVaccineData.stock = stock;
