@@ -48,10 +48,6 @@ const vaccinationCentreSchema = new mongoose.Schema({
     available_slots: {
         type: [Date]
     },
-    paid: {
-        type: Boolean,
-        default: false
-    },
     password: {
         type: String,
         required: true,
