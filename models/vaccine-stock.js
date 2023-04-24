@@ -10,6 +10,10 @@ const vaccineStockSchema = new mongoose.Schema({
         type: Array,
         default: [Number],
     },
+    paid: {
+        type: Array,
+        default: [Boolean]
+    }
 }, { timestamps: true });
 
 module.exports = mongoose.model("VaccineStock", vaccineStockSchema);
