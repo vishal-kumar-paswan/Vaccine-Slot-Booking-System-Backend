@@ -34,7 +34,7 @@ router.post("/register-vaccination-centre",
 );
 
 // Login route
-router.post("/login",
+router.post("/login-to-vaccination-centre",
     [
         check("email", "Email is required").exists(),
         check("email", "Enter a valid email").isEmail(),
@@ -64,6 +64,9 @@ router.post("/add-vaccine/:vaccinationcentreid",
 
         check("count", "count is required").exists(),
         check("count", "count must be integer").isInt(),
+
+        check("paid", "paid is required").exists(),
+        check("paid", "paid must be boolean").isBoolean(),
     ],
     addVaccine
 );
@@ -77,6 +80,9 @@ router.put("/update-stock/:vaccinationcentreid",
 
         check("count", "count is required").exists(),
         check("count", "count must be integer").isInt(),
+
+        check("paid", "paid is required").exists(),
+        check("paid", "paid must be boolean").isBoolean(),
     ],
     updateStock
 );
