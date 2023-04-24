@@ -57,7 +57,6 @@ exports.registerVaccinationCentre = async (req, res) => {
             pin_code: vaccinationCentreData.pin_code,
             district: vaccinationCentreData.district,
             state: vaccinationCentreData.state,
-            paid: vaccinationCentreData.paid,
         });
     } catch (error) {
         return res.status(400).json({ error: error });
@@ -84,10 +83,16 @@ exports.loginToVaccinationCentre = async (req, res) => {
         }
 
         if (vaccinationCentre.authenticate(password)) {
-            const { _id, centre_name, email, phone, address, pin_code, district, state, paid } = vaccinationCentre;
-            const { vaccine, stock } = vaccinationCentre.vaccines;
-            let vaccineData = {};
-            vaccine.map((item, index) => vaccineData[item] = stock[index]);
+            const { _id, centre_name, email, phone, address, pin_code, district, state } = vaccinationCentre;
+            const { vaccine, stock, paid } = vaccinationCentre.vaccines;
+            let vaccineData = [];
+            vaccine.map((item, index) => {
+                vaccineData.push({
+                    name: item,
+                    stock: stock[index],
+                    paid: paid[index]
+                });
+            });
 
             return res.status(200).json({
                 _id: _id,
@@ -99,7 +104,6 @@ exports.loginToVaccinationCentre = async (req, res) => {
                 district: district,
                 state: state,
                 vaccines: vaccineData,
-                paid: paid
             });
         } else {
             return res.status(400).json({ error: "Password is incorrect" });
@@ -124,21 +128,24 @@ exports.searchVaccinationCentresUsingPIN = async (req, res) => {
 
             let vaccinationCentreList = [];
             vaccinationCentresData.map((item, index) => {
-                let vaccineData = {};
-                const { _id, centre_name, email, phone, paid } = item;
-                const { vaccine, stock } = item.vaccines;
+                let vaccineData = [];
+                const { _id, centre_name, email, phone } = item;
+                const { vaccine, stock, paid } = item.vaccines;
 
-                vaccine.map((item, index) => vaccineData[item] = stock[index]);
-
-                console.log(vaccineData);
+                vaccine.map((item, index) => {
+                    vaccineData.push({
+                        name: item,
+                        stock: stock[index],
+                        paid: paid[index]
+                    });
+                });
 
                 vaccinationCentreList.push({
                     _id: _id,
                     centre_name: centre_name,
                     email: email,
                     phone: phone,
-                    vaccines: vaccineData,
-                    paid, paid
+                    vaccines: vaccineData
                 });
             });
 
@@ -165,19 +172,24 @@ exports.searchVaccinationCentresUsingDistrict = async (req, res) => {
             let vaccinationCentreList = [];
 
             vaccinationCentres.map((item, index) => {
-                let vaccineData = {};
-                const { _id, centre_name, email, phone, paid } = item;
-                const { vaccine, stock } = item.vaccines;
+                let vaccineData = [];
+                const { _id, centre_name, email, phone } = item;
+                const { vaccine, stock, paid } = item.vaccines;
 
-                vaccine.map((item, index) => vaccineData[item] = stock[index]);
+                vaccine.map((item, index) => {
+                    vaccineData.push({
+                        name: item,
+                        stock: stock[index],
+                        paid: paid[index]
+                    });
+                });
 
                 vaccinationCentreList.push({
                     _id: _id,
                     centre_name: centre_name,
                     email: email,
                     phone: phone,
-                    vaccines: vaccineData,
-                    paid, paid
+                    vaccines: vaccineData
                 });
             });
             return res.status(200).json(vaccinationCentreList);
@@ -201,11 +213,17 @@ exports.getVaccinationCentreDetails = async (req, res) => {
 
         if (vaccinationCentreDetails) {
             const { _id, centre_name, email, phone, address, pin_code, district, state, available_slots } = vaccinationCentreDetails;
-            const { vaccine, stock } = vaccinationCentreDetails.vaccines;
+            const { vaccine, stock, paid } = vaccinationCentreDetails.vaccines;
 
-            let vaccineData = {};
+            let vaccineData = [];
 
-            vaccine.map((item, index) => vaccineData[item] = stock[index]);
+            vaccine.map((item, index) => {
+                vaccineData.push({
+                    name: item,
+                    stock: stock[index],
+                    paid: paid[index]
+                });
+            });
 
             return res.status(200).json({
                 _id: _id,
@@ -228,7 +246,6 @@ exports.getVaccinationCentreDetails = async (req, res) => {
 
 exports.addVaccine = async (req, res) => {
     try {
-
         const errors = validationResult(req);
 
         if (!errors.isEmpty()) {
@@ -250,37 +267,60 @@ exports.addVaccine = async (req, res) => {
         let existingVaccineData = await VaccinationStock.findById({ _id: vaccineStockId.vaccines._id });
         let vaccine = existingVaccineData.vaccine;
         let stock = existingVaccineData.stock;
+        let isPaid = existingVaccineData.paid;
 
         // Destructuring req.body
-        let { name, count } = req.body;
+        let { name, count, paid } = req.body;
         name = name.toLowerCase();
-        count = parseInt(count);
 
-        // Checking if the vaccine exists in database
+        // If the vaccine with the same name exists in database,
+        //    We'll be fetching the index of the vaccine from the vaccine array
+        //    We'll only be pushing the data into the array under two conditions -
+        //       1. When index1 = index2 and existing vaccine's paid is not equal to new vaccine's paid
+        //       2. When existing vaccines's paid is not equal to new vaccine's paid
+        // Otherwise, we'll be pushing new vaccines data into the array in the else block
         if (vaccine.includes(name)) {
-            return res.status(400).json({ error: `${name} exists in database` });
+            const index1 = vaccine.indexOf(name);
+            const index2 = vaccine.lastIndexOf(name);
+            if ((index1 == index2) && isPaid[index1] != paid) {
+                vaccine.push(name);
+                stock.push(count);
+                isPaid.push(paid);
+            } else if (!(isPaid[index1] == paid || isPaid[index2] == paid)) {
+                vaccine.push(name);
+                stock.push(count);
+                isPaid.push(paid);
+            } else {
+                return res.status(400).json({ error: `${paid ? "paid" : "free"} version of ${name} exists in database` });
+            }
+        } else {
+            vaccine.push(name);
+            stock.push(count);
+            isPaid.push(paid);
         }
-
-        // Adding new data to vaccine and stock array
-        vaccine.push(name);
-        stock.push(count);
 
         // Updating the vaccine and stock arrays
         existingVaccineData.vaccine = vaccine;
         existingVaccineData.stock = stock;
+        existingVaccineData.paid = isPaid;
 
         // Saving the updated data into the Database
         const updatedVaccineData = await existingVaccineData.save();
         const updatedVaccine = updatedVaccineData.vaccine;
         const updatedStock = updatedVaccineData.stock;
+        const updatedIsPaid = updatedVaccineData.paid;
 
-        // Mapping vaccine and stock array into updatedVaccineObject
-        let updatedVaccineObject = {};
+        // Mapping vaccine, stock and paid array into updatedVaccineArray
+        let updatedVaccineArray = [];
         updatedVaccine.map((item, index) => {
-            updatedVaccineObject[item] = updatedStock[index];
+            updatedVaccineArray.push({
+                name: item,
+                stock: updatedStock[index],
+                paid: updatedIsPaid[index]
+            })
         });
 
-        return res.status(200).json(updatedVaccineObject);
+        return res.status(200).json(updatedVaccineArray);
     } catch (error) {
         return res.status(400).json({ error: error });
     }
@@ -289,9 +329,7 @@ exports.addVaccine = async (req, res) => {
 //  Update vaccination centre stock
 exports.updateStock = async (req, res) => {
     try {
-
         const errors = validationResult(req);
-
         if (!errors.isEmpty()) {
             return res.status(422).json({
                 error: errors.array()[0].msg,
@@ -309,13 +347,13 @@ exports.updateStock = async (req, res) => {
 
         // Fetching the existing vaccine stock corrosponding to the vaccination centre
         let existingVaccineData = await VaccinationStock.findById({ _id: vaccineStockId.vaccines._id });
-        let vaccine = existingVaccineData.vaccine;
+        const vaccine = existingVaccineData.vaccine;
         let stock = existingVaccineData.stock;
+        const isPaid = existingVaccineData.paid;
 
         // Destructuring req.body
-        let { name, count } = req.body;
+        let { name, count, paid } = req.body;
         name = name.toLowerCase();
-        count = parseInt(count);
 
         // Checking if the vaccine does not exists in database
         if (!vaccine.includes(name)) {
@@ -324,22 +362,38 @@ exports.updateStock = async (req, res) => {
 
         // Finding the index of the vaccine in the array
         // to update the corrosponding count 
-        const index = vaccine.indexOf(name);
-        stock[index] += count;
+        const index1 = vaccine.indexOf(name);
+        const index2 = vaccine.lastIndexOf(name);
+
+        if (index1 == index2) {
+            console.log("SAME INDEX GETTING EXECUTED");
+            stock[index1] += count;
+        } else if (isPaid[index1] == paid) {
+            stock[index1] += count;
+        } else if (isPaid[index2] == paid) {
+            stock[index2] += count;
+
+        }
+
         existingVaccineData.stock = stock;
 
         // Saving the updated data into the Database
         const updatedVaccineData = await existingVaccineData.save();
         const updatedVaccine = updatedVaccineData.vaccine;
         const updatedStock = updatedVaccineData.stock;
+        const updatedIsPaid = updatedVaccineData.paid;
 
-        // Mapping vaccine and stock array into updatedVaccineObject
-        let updatedVaccineObject = {};
+        // Mapping vaccine, stock and paid array into updatedVaccineArray
+        let updatedVaccineArray = [];
         updatedVaccine.map((item, index) => {
-            updatedVaccineObject[item] = updatedStock[index];
+            updatedVaccineArray.push({
+                name: item,
+                stock: updatedStock[index],
+                paid: updatedIsPaid[index]
+            })
         });
 
-        return res.status(200).json(updatedVaccineObject);
+        return res.status(200).json(updatedVaccineArray);
     } catch (error) {
         return res.status(400).json({ error: error });
     }
