@@ -16,10 +16,10 @@ router.post("/register-vaccination-centre",
         check("phone", "Enter a valid phone number").isLength({ min: 2 }),
 
         check("address", "Address is required").exists(),
-        check("address", "Enter a valid address").isLength({ min: 3 }),
+        check("address", "Enter a valid address").isLength({ min: 2 }),
 
         check("pin_code", "PIN code is required").exists(),
-        check("pin_code", "Enter a valid PIN code").isLength({ min: 3 }),
+        check("pin_code", "Enter a valid PIN code").isNumeric(),
 
         check("district", "District is required").exists(),
         check("district", "Enter a valid district").isLength({ min: 2 }),
