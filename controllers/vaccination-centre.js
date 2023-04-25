@@ -1,6 +1,7 @@
 const { validationResult } = require("express-validator");
 const VaccinationCentre = require("../models/vaccination-centre");
 const VaccinationStock = require("../models/vaccine-stock");
+const _ = require('lodash');
 
 // Register vaccination centre
 exports.registerVaccinationCentre = async (req, res) => {
@@ -36,8 +37,12 @@ exports.registerVaccinationCentre = async (req, res) => {
         }
 
         // Storing the ObjectId along with other data inside req.body
-        // into the registrationData
+        // into the registrationData.
+        // Also we are storing the district in lower case so that, in future 
+        // it would help to find the Vaccination centre easily, irrespetive of 
+        // upper or lower case
         let registrationData = req.body;
+        registrationData.district = registrationData.district.toLowerCase();
         registrationData.vaccines = vaccineStockData._id;
 
         // Storing the registrationData into the vaccination centre database
@@ -63,6 +68,7 @@ exports.registerVaccinationCentre = async (req, res) => {
     }
 }
 
+// Login vaccination centre
 exports.loginToVaccinationCentre = async (req, res) => {
     try {
         const errors = validationResult(req);
@@ -118,10 +124,10 @@ exports.loginToVaccinationCentre = async (req, res) => {
 // Fetch all vaccination centres using PIN code
 exports.searchVaccinationCentresUsingPIN = async (req, res) => {
     try {
-        const pinCode = req.params.pincode;
+        const pinCode = parseInt(req.params.pincode);
 
-        const vaccinationCentresData = await VaccinationCentre.find({ pin_code: parseInt(pinCode) },
-            "_id centre_name email phone paid"
+        const vaccinationCentresData = await VaccinationCentre.find({ pin_code: pinCode },
+            "_id centre_name email phone address paid"
         ).populate("vaccines", "-_id -createdAt -updatedAt -__v");
 
         if (vaccinationCentresData) {
@@ -129,7 +135,7 @@ exports.searchVaccinationCentresUsingPIN = async (req, res) => {
             let vaccinationCentreList = [];
             vaccinationCentresData.map((item, index) => {
                 let vaccineData = [];
-                const { _id, centre_name, email, phone } = item;
+                const { _id, centre_name, email, phone, address } = item;
                 const { vaccine, stock, paid } = item.vaccines;
 
                 vaccine.map((item, index) => {
@@ -145,6 +151,7 @@ exports.searchVaccinationCentresUsingPIN = async (req, res) => {
                     centre_name: centre_name,
                     email: email,
                     phone: phone,
+                    address: address,
                     vaccines: vaccineData
                 });
             });
@@ -161,10 +168,10 @@ exports.searchVaccinationCentresUsingPIN = async (req, res) => {
 // Fetch all vaccination centres using district
 exports.searchVaccinationCentresUsingDistrict = async (req, res) => {
     try {
-        const district = req.params.district;
+        const district = req.params.district.toLowerCase();
 
         const vaccinationCentres = await VaccinationCentre.find({ district: district },
-            "_id centre_name email phone paid"
+            "_id centre_name email phone address paid"
         ).populate("vaccines", "-_id -createdAt -updatedAt -__v");
 
         if (vaccinationCentres) {
@@ -173,7 +180,7 @@ exports.searchVaccinationCentresUsingDistrict = async (req, res) => {
 
             vaccinationCentres.map((item, index) => {
                 let vaccineData = [];
-                const { _id, centre_name, email, phone } = item;
+                const { _id, centre_name, email, phone, address } = item;
                 const { vaccine, stock, paid } = item.vaccines;
 
                 vaccine.map((item, index) => {
@@ -189,6 +196,7 @@ exports.searchVaccinationCentresUsingDistrict = async (req, res) => {
                     centre_name: centre_name,
                     email: email,
                     phone: phone,
+                    address: address,
                     vaccines: vaccineData
                 });
             });
@@ -366,7 +374,6 @@ exports.updateStock = async (req, res) => {
         const index2 = vaccine.lastIndexOf(name);
 
         if (index1 == index2 && isPaid[index1] == paid) {
-            console.log("SAME INDEX GETTING EXECUTED");
             stock[index1] += count;
         } else if (isPaid[index1] == paid) {
             stock[index1] += count;
