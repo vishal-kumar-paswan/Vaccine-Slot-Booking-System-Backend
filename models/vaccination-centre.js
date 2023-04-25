@@ -29,7 +29,6 @@ const vaccinationCentreSchema = new mongoose.Schema({
         type: Number,
         required: true,
         trim: true,
-        maxLength: 6
     },
     district: {
         type: String,
@@ -45,7 +44,7 @@ const vaccinationCentreSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: "VaccineStock"
     },
-    available_slots: {
+    slots: {
         type: [Date]
     },
     password: {
@@ -57,7 +56,6 @@ const vaccinationCentreSchema = new mongoose.Schema({
 
 // Defining userSchema methods
 vaccinationCentreSchema.methods = {
-    // authenticate while signing in
     authenticate: function (plainPassword) {
         return plainPassword === this.password
     }
