@@ -1,7 +1,9 @@
 const { validationResult } = require("express-validator");
 const VaccinationCentre = require("../models/vaccination-centre");
 const VaccinationStock = require("../models/vaccine-stock");
-const _ = require('lodash');
+
+// Authorization key list
+const authorizationKey = ["5kpqrz", "wadogp", "z2urlh", "ea28ba", "fp94fq"];
 
 // Register vaccination centre
 exports.registerVaccinationCentre = async (req, res) => {
@@ -15,7 +17,7 @@ exports.registerVaccinationCentre = async (req, res) => {
             });
         }
 
-        const { email, phone } = req.body;
+        const { email, phone, auth_key } = req.body;
         const emailExists = await VaccinationCentre.findOne({ email }, 'email -_id').exec();
         const phoneExists = await VaccinationCentre.findOne({ phone }, 'phone -_id').exec();
 
@@ -25,6 +27,10 @@ exports.registerVaccinationCentre = async (req, res) => {
         if (phoneExists) {
             return res.status(400).json({ error: "Phone number is already registered" });
         }
+        if (!authorizationKey.includes(auth_key)) {
+            return res.status(400).json({ error: "Invalid authorization key" });
+        }
+
 
         // First, creating a default object of the stock data
         // to get the ObjectId and store it in the vaccination centre schema
