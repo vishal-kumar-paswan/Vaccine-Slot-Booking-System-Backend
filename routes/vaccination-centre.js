@@ -27,6 +27,9 @@ router.post("/register-vaccination-centre",
         check("state", "State is required").exists(),
         check("state", "Enter a valid state").isLength({ min: 2 }),
 
+        check("auth_key", "Authorization key is required").exists(),
+        check("auth_key", "Enter a valid authorization key").isLength({ min: 3 }),
+
         check("password", "Password is required").exists(),
         check("password", "Password should be atleast 3 characters").isLength({ min: 3 }),
     ],
