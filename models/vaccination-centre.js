@@ -47,6 +47,11 @@ const vaccinationCentreSchema = new mongoose.Schema({
     slots: {
         type: [Date]
     },
+    bookings: {
+        type: [mongoose.Schema.Types.ObjectId],
+        default: [],
+        ref: "BookSlot"
+    },
     password: {
         type: String,
         required: true,

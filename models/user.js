@@ -31,8 +31,9 @@ const userSchema = new mongoose.Schema({
         trim: true,
     },
     appointments: {
-        type: Array,
-        default: []
+        type: [mongoose.Schema.Types.ObjectId],
+        default: [],
+        ref: "BookSlot"
     }
 }, { timestamps: true });
 
