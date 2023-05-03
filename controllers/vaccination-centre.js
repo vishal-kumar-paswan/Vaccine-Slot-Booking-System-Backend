@@ -1,7 +1,9 @@
 const { validationResult } = require("express-validator");
 const VaccinationCentre = require("../models/vaccination-centre");
 const VaccinationStock = require("../models/vaccine-stock");
+const User = require("../models/user");
 const BookSlot = require("../models/book-slot");
+const { ObjectId } = require("mongodb");
 
 
 // Authorization key list
@@ -413,6 +415,37 @@ exports.updateStock = async (req, res) => {
         });
 
         return res.status(200).json(updatedVaccineArray);
+    } catch (error) {
+        return res.status(400).json({ error: error });
+    }
+}
+
+// Complete bookings
+exports.completeBooking = async (req, res) => {
+    try {
+        const slotBookingId = req.params.bookingId;
+        const vaccinationCentreId = req.params.vaccinationCentreId;
+        const userId = req.params.userId;
+
+        const slotBookingDetails = await BookSlot.findById(slotBookingId, "completed");
+        const vaccinationCentreDetails = await VaccinationCentre.findById(vaccinationCentreId, "bookings");
+        const userDetails = await User.findById(userId, "appointments");
+
+        if (!(slotBookingDetails && vaccinationCentreDetails && userDetails)) {
+            return res.status(400).json({ error: "failed to complete the process" });
+        }
+
+        // Setting completed as true
+        slotBookingDetails.completed = true;
+        await slotBookingDetails.save();
+
+        // Removing the SlotBooking id from both VaccinationCentre and User database
+        vaccinationCentreDetails.bookings = vaccinationCentreDetails.bookings.filter(item => { item !== new ObjectId(slotBookingId) });
+        await vaccinationCentreDetails.save();
+        userDetails.appointments = userDetails.appointments.filter(item => { item !== new ObjectId(slotBookingId) });
+        await userDetails.save();
+
+        return res.status(200).json({ message: "vaccination process completed" });
     } catch (error) {
         return res.status(400).json({ error: error });
     }
