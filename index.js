@@ -9,6 +9,7 @@ const PORT = process.env.PORT || 8000;
 // Importing routes
 const userRoute = require("./routes/user");
 const vaccinationCentreRoute = require("./routes/vaccination-centre");
+const bookSlotRoutes = require("./routes/book-slot");
 
 
 const admin = encodeURIComponent(process.env.ADMIN);
@@ -30,5 +31,6 @@ app.use(bodyParser.json());
 
 app.use(userRoute);
 app.use(vaccinationCentreRoute);
+app.use(bookSlotRoutes);
 
 app.listen(PORT, () => console.log(`app is live at port ${PORT}`));
