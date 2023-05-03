@@ -16,6 +16,10 @@ const bookSlotSchema = new mongoose.Schema({
         required: true,
         trim: true
     },
+    paid: {
+        type: Boolean,
+        required: true
+    },
     date: {
         type: Date,
         required: true
