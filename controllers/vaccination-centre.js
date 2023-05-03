@@ -1,6 +1,8 @@
 const { validationResult } = require("express-validator");
 const VaccinationCentre = require("../models/vaccination-centre");
 const VaccinationStock = require("../models/vaccine-stock");
+const BookSlot = require("../models/book-slot");
+
 
 // Authorization key list
 const authorizationKey = ["5kpqrz", "wadogp", "z2urlh", "ea28ba", "fp94fq"];
@@ -223,10 +225,12 @@ exports.getVaccinationCentreDetails = async (req, res) => {
 
         let vaccinationCentreDetails = await VaccinationCentre.findById(vaccinationCentreId,
             '-password -createdAt -updatedAt -__v'
-        ).populate("vaccines", "-_id -createdAt -updatedAt -__v");
+        ).populate("vaccines", "-_id -createdAt -updatedAt -__v")
+            .populate({ path: "bookings", model: "BookSlot", select: '-_id -__v' }).exec();
 
         if (vaccinationCentreDetails) {
-            const { _id, centre_name, email, phone, address, pin_code, district, state, available_slots } = vaccinationCentreDetails;
+            const { _id, centre_name, email, phone, address, pin_code, district, state, bookings } = vaccinationCentreDetails;
+
             const { vaccine, stock, paid } = vaccinationCentreDetails.vaccines;
 
             let vaccineData = [];
@@ -249,7 +253,7 @@ exports.getVaccinationCentreDetails = async (req, res) => {
                 district: district,
                 state: state,
                 vaccines: vaccineData,
-                available_slots: available_slots
+                bookings: bookings
             });
         }
         res.status(400).json({ error: "Vaccination centre does not exists" });

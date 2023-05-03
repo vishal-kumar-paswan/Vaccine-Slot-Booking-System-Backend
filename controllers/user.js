@@ -54,7 +54,9 @@ exports.signin = async (req, res) => {
         }
 
         const { email, password } = req.body;
-        const user = await User.findOne({ email }).exec();
+        const user = await User.findOne({ email })
+            .populate({ path: "appointments", model: "BookSlot", select: '-_id -__v' }).exec();
+
 
         if (!user) {
             return res.status(400).json({ error: "User does not exist" });
