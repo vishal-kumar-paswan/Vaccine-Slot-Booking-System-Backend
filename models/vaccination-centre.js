@@ -44,9 +44,6 @@ const vaccinationCentreSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: "VaccineStock"
     },
-    slots: {
-        type: [Date]
-    },
     bookings: {
         type: [mongoose.Schema.Types.ObjectId],
         default: [],
