@@ -1,4 +1,5 @@
 const { validationResult } = require("express-validator");
+const { signupMail } = require("./email");
 const User = require("../models/user");
 
 // User sign up
@@ -26,6 +27,9 @@ exports.signup = async (req, res) => {
 
         const user = new User(req.body);
         const userData = await user.save();
+
+        // Sending a confirmation mail
+        signupMail(email, req.body.name);
 
         return res.status(200).json({
             id: userData._id,

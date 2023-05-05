@@ -1,4 +1,5 @@
 const { validationResult } = require("express-validator");
+const { registrationMail } = require("./email");
 const VaccinationCentre = require("../models/vaccination-centre");
 const VaccinationStock = require("../models/vaccine-stock");
 const User = require("../models/user");
@@ -62,6 +63,9 @@ exports.registerVaccinationCentre = async (req, res) => {
         if (!vaccinationCentreData) {
             return res.send(400).json({ error: "Vaccination centre registration failed" })
         }
+
+        // Sending a confirmation mail
+        registrationMail(email);
 
         return res.status(200).json({
             _id: vaccinationCentreData._id,
