@@ -15,10 +15,11 @@ const bookSlotRoutes = require("./routes/book-slot");
 const admin = encodeURIComponent(process.env.ADMIN);
 const password = encodeURIComponent(process.env.PASSWORD);
 const cluster = process.env.CLUSTER;
-const dbURL = `mongodb+srv://${admin}:${password}@${cluster}/?retryWrites=true&w=majority`;
+const testDatabaseURL = `mongodb+srv://${admin}:${password}@${cluster}/?retryWrites=true&w=majority`;
+const databaseURL = process.env.MONGODB_URI || process.env.LOCAL_DATABASE;
 
 // Database connection
-mongoose.connect(process.env.MONGODB_URI, {
+mongoose.connect(databaseURL, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
 }).then(() => {
