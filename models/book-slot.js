@@ -1,22 +1,14 @@
 const mongoose = require("mongoose");
 
 const bookSlotSchema = new mongoose.Schema({
-    user_name: {
-        type: String,
-        required: true,
-        trim: true
-    },
     userId: {
         type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
         required: true
-    },
-    centre_name: {
-        type: String,
-        required: true,
-        trim: true
     },
     centreId: {
         type: mongoose.Schema.Types.ObjectId,
+        ref: "VaccinationCentre",
         required: true
     },
     vaccine: {
