@@ -92,7 +92,8 @@ exports.loginToVaccinationCentre = async (req, res) => {
 
         const { email, password } = req.body;
         const vaccinationCentre = await VaccinationCentre.findOne({ email })
-            .populate('vaccines', '-_id -createdAt -updatedAt -__v');
+            .populate('vaccines', '-_id -createdAt -updatedAt -__v')
+            .populate({ path: "bookings", model: "BookSlot", select: '-__v' }).exec();
 
         if (!vaccinationCentre) {
             return res.status(400).json({ error: "Vaccination centre does not exists" });
@@ -227,7 +228,7 @@ exports.getVaccinationCentreDetails = async (req, res) => {
         let vaccinationCentreDetails = await VaccinationCentre.findById(vaccinationCentreId,
             '-password -createdAt -updatedAt -__v'
         ).populate("vaccines", "-_id -createdAt -updatedAt -__v")
-            .populate({ path: "bookings", model: "BookSlot", select: '-_id -__v' }).exec();
+            .populate({ path: "bookings", model: "BookSlot", select: '-__v' }).exec();
 
         if (vaccinationCentreDetails) {
             const { _id, centre_name, email, phone, address, pin_code, district, state, bookings } = vaccinationCentreDetails;
