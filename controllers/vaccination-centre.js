@@ -99,7 +99,7 @@ exports.loginToVaccinationCentre = async (req, res) => {
         }
 
         if (vaccinationCentre.authenticate(password)) {
-            const { _id, centre_name, email, phone, address, pin_code, district, state } = vaccinationCentre;
+            const { _id, centre_name, email, phone, address, pin_code, district, state, bookings } = vaccinationCentre;
             const { vaccine, stock, paid } = vaccinationCentre.vaccines;
             let vaccineData = [];
             vaccine.map((item, index) => {
@@ -120,6 +120,7 @@ exports.loginToVaccinationCentre = async (req, res) => {
                 district: district,
                 state: state,
                 vaccines: vaccineData,
+                bookings: bookings
             });
         } else {
             return res.status(400).json({ error: "Password is incorrect" });
@@ -128,8 +129,6 @@ exports.loginToVaccinationCentre = async (req, res) => {
         return res.status(400).json({ error: error });
     }
 }
-
-
 
 // Fetch all vaccination centres using PIN code
 exports.searchVaccinationCentresUsingPIN = async (req, res) => {
@@ -421,7 +420,7 @@ exports.updateStock = async (req, res) => {
 }
 
 // Complete bookings
-exports.completeBooking = async (req, res) => {
+exports.approveBooking = async (req, res) => {
     try {
         const slotBookingId = req.params.bookingId;
         const vaccinationCentreId = req.params.vaccinationCentreId;
