@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const { check } = require("express-validator");
-const { registerVaccinationCentre, loginToVaccinationCentre, searchVaccinationCentresUsingPIN, searchVaccinationCentresUsingDistrict, getVaccinationCentreDetails, addVaccine, updateStock, completeBooking } = require("../controllers/vaccination-centre");
+const { registerVaccinationCentre, loginToVaccinationCentre, searchVaccinationCentresUsingPIN, searchVaccinationCentresUsingDistrict, getVaccinationCentreDetails, addVaccine, updateStock, approveBooking } = require("../controllers/vaccination-centre");
 
 // Registration route
 router.post("/register-vaccination-centre",
@@ -91,6 +91,6 @@ router.put("/update-stock/:vaccinationcentreid",
 );
 
 // Complete bookings
-router.get("/complete-booking/:vaccinationCentreId/:userId/:bookingId", completeBooking);
+router.get("/complete-booking/:vaccinationCentreId/:userId/:bookingId", approveBooking);
 
 module.exports = router;
