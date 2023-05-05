@@ -20,20 +20,16 @@ const bookSlotSchema = new mongoose.Schema({
         type: Boolean,
         required: true
     },
-    date: {
-        type: Date,
-        required: true
-    },
-    completed: {
+    approved: {
         type: Boolean,
-        default: false
+        default: null
     }
 });
 
 // Defining bookSlotSchema methods
 bookSlotSchema.methods = {
-    vaccinated: function () {
-        this.completed = true;
+    approval: function (value) {
+        this.approved = value;
     }
 };
 
