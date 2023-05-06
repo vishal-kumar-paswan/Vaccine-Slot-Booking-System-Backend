@@ -23,6 +23,10 @@ const bookSlotSchema = new mongoose.Schema({
     approved: {
         type: Boolean,
         default: null
+    },
+    date: {
+        type: String,
+        default: null
     }
 });
 
