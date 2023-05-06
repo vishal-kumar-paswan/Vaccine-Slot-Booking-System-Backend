@@ -127,6 +127,7 @@ exports.loginToVaccinationCentre = async (req, res) => {
                 const vaccinationCentreData = await VaccinationCentre.findById(bookings[i].centreId, "centre_name").exec();
 
                 // Adding all data into the object
+                bookingObject._id = bookings[i]._id;
                 bookingObject.name = userData.name;
                 bookingObject.centre_name = vaccinationCentreData.centre_name;
                 bookingObject.vaccine = bookings[i].vaccine;
