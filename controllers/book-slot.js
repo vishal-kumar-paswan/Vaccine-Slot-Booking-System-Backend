@@ -118,6 +118,7 @@ exports.approveBooking = async (req, res) => {
         const centre_name = bookingInstance.centreId.centre_name;
         const address = bookingInstance.centreId.address;
         bookingInstance.approval(approved);
+        bookingInstance.date = date;
         await bookingInstance.save();
 
         // If the approval is declined a mail and error message will be returned

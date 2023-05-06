@@ -115,6 +115,29 @@ exports.loginToVaccinationCentre = async (req, res) => {
                 });
             });
 
+            // Array for storing all the bookingObjects
+            let bookingData = [];
+
+            // Iterating through all bookings elements
+            for (let i = 0; i < bookings.length; i++) {
+                let bookingObject = {};
+
+                // Fetching name and centre_name from User and VaccinationCentre database
+                const userData = await User.findById(bookings[i].userId, "name").exec();
+                const vaccinationCentreData = await VaccinationCentre.findById(bookings[i].centreId, "centre_name").exec();
+
+                // Adding all data into the object
+                bookingObject.name = userData.name;
+                bookingObject.centre_name = vaccinationCentreData.centre_name;
+                bookingObject.vaccine = bookings[i].vaccine;
+                bookingObject.paid = bookings[i].paid;
+                bookingObject.approved = bookings[i].approved;
+                bookingObject.date = bookings[i].date;
+
+                // pushing element into the array
+                bookingData.push(bookingObject);
+            }
+
             return res.status(200).json({
                 _id: _id,
                 centre_name: centre_name,
@@ -125,7 +148,7 @@ exports.loginToVaccinationCentre = async (req, res) => {
                 district: district,
                 state: state,
                 vaccines: vaccineData,
-                bookings: bookings
+                bookings: bookingData
             });
         } else {
             return res.status(400).json({ error: "Password is incorrect" });
