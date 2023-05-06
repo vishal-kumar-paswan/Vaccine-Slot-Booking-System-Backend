@@ -1,22 +1,5 @@
 const nodemailer = require("nodemailer");
 
-// Creating SMTP instance
-const transporter = nodemailer.createTransport({
-    service: 'gmail',
-    port: 300,
-    secure: true,
-    logger: true,
-    debug: true,
-    secureConnection: false,
-    auth: {
-        user: process.env.EMAIL,
-        pass: process.env.APP_PASSWORD
-    },
-    tls: {
-        rejectUnauthorized: true
-    },
-});
-
 // User signup email
 exports.signupMail = async (email, name) => {
     const mailTemplate =
@@ -36,6 +19,23 @@ Thank you for choosing eVaccination Portal as your trusted source for vaccinatio
 Best regards,
 eVaccination Portal Team
 `;
+
+    // Creating SMTP instance
+    const transporter = nodemailer.createTransport({
+        service: 'gmail',
+        port: 300,
+        secure: true,
+        logger: true,
+        debug: true,
+        secureConnection: false,
+        auth: {
+            user: process.env.EMAIL,
+            pass: process.env.APP_PASSWORD
+        },
+        tls: {
+            rejectUnauthorized: true
+        },
+    });
 
     transporter.verify((err, success) => {
         if (err) console.error("Erorrr::", err);
@@ -78,6 +78,23 @@ Best regards,
 eVaccination Portal Team
 `;
 
+    // Creating SMTP instance
+    const transporter = nodemailer.createTransport({
+        service: 'gmail',
+        port: 300,
+        secure: true,
+        logger: true,
+        debug: true,
+        secureConnection: false,
+        auth: {
+            user: process.env.EMAIL,
+            pass: process.env.APP_PASSWORD
+        },
+        tls: {
+            rejectUnauthorized: true
+        },
+    });
+
     transporter.verify((err, success) => {
         if (err) console.error("Erorrr::", err);
         console.log("Success: ", success);
@@ -109,6 +126,23 @@ Thank you for booking your vaccination through eVaccination Portal. You'll be re
 Regards,
 eVaccination Portal Team.
 `;
+
+    // Creating SMTP instance
+    const transporter = nodemailer.createTransport({
+        service: 'gmail',
+        port: 300,
+        secure: true,
+        logger: true,
+        debug: true,
+        secureConnection: false,
+        auth: {
+            user: process.env.EMAIL,
+            pass: process.env.APP_PASSWORD
+        },
+        tls: {
+            rejectUnauthorized: true
+        },
+    });
 
     transporter.verify((err, success) => {
         if (err) console.error("Erorrr::", err);
@@ -148,6 +182,23 @@ eVaccination Portal Team.
 
 `;
 
+    // Creating SMTP instance
+    const transporter = nodemailer.createTransport({
+        service: 'gmail',
+        port: 300,
+        secure: true,
+        logger: true,
+        debug: true,
+        secureConnection: false,
+        auth: {
+            user: process.env.EMAIL,
+            pass: process.env.APP_PASSWORD
+        },
+        tls: {
+            rejectUnauthorized: true
+        },
+    });
+
     transporter.verify((err, success) => {
         if (err) console.error("Erorrr::", err);
         console.log("Success: ", success);
@@ -184,6 +235,23 @@ Thank you for your understanding and cooperation.
 Best regards,
 eVaccination Portal Team.
 `;
+
+    // Creating SMTP instance
+    const transporter = nodemailer.createTransport({
+        service: 'gmail',
+        port: 300,
+        secure: true,
+        logger: true,
+        debug: true,
+        secureConnection: false,
+        auth: {
+            user: process.env.EMAIL,
+            pass: process.env.APP_PASSWORD
+        },
+        tls: {
+            rejectUnauthorized: true
+        },
+    });
 
     transporter.verify((err, success) => {
         if (err) console.error(err);
