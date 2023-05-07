@@ -108,3 +108,45 @@ exports.signin = async (req, res) => {
         return res.status(400).json({ error: error });
     }
 }
+
+exports.getAppointments = async (req, res) => {
+    try {
+        const userId = req.params.userId;
+        const userDetails = await User.findById(userId, "_id")
+            .populate({ path: "appointments", model: "BookSlot", select: '-__v' }).exec();
+
+        if (!userDetails) {
+            return res.status(400).json({ error: "user does not exists" });
+        }
+
+        const { appointments } = userDetails;
+
+        // Array for storing all the appointmentObjects
+        let appointmentData = [];
+
+        // Iterating through all appointments elements
+        for (let i = 0; i < appointments.length; i++) {
+            let appointmentObject = {};
+
+            // Fetching name and centre_name from User and VaccinationCentre database
+            const userData = await User.findById(appointments[i].userId, "name").exec();
+            const vaccinationCentreData = await VaccinationCentre.findById(appointments[i].centreId, "centre_name").exec();
+
+            // Adding all data into the object
+            appointmentObject.name = userData.name;
+            appointmentObject.centre_name = vaccinationCentreData.centre_name;
+            appointmentObject.vaccine = appointments[i].vaccine;
+            appointmentObject.paid = appointments[i].paid;
+            appointmentObject.booking_date = appointments[i].createdAt;
+            appointmentObject.approved = appointments[i].approved;
+            appointmentObject.allotted_date = appointments[i].date;
+
+            // pushing element into the array
+            appointmentData.push(appointmentObject);
+        }
+
+        return res.status(200).json({ appointments: appointmentData });
+    } catch (error) {
+        return res.status(400).json({ error: error });
+    }
+}

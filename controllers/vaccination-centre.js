@@ -448,6 +448,51 @@ exports.updateStock = async (req, res) => {
     }
 }
 
+// Get all bookings
+exports.getBookings = async (req, res) => {
+    try {
+        const vaccinationCentreId = req.params.vaccinationCentreId;
+        const vaccinationCentreDetails = await VaccinationCentre.findById(vaccinationCentreId, "_id")
+            .populate({ path: "bookings", model: "BookSlot", select: '-__v' }).exec();
+        console.log("details", vaccinationCentreDetails);
+
+        if (!vaccinationCentreDetails) {
+            return res.status(400).json({ error: "vaccination centre does not exists" });
+        }
+
+        const { bookings } = vaccinationCentreDetails;
+
+        // Array for storing all the bookingObjects
+        let bookingData = [];
+
+        // Iterating through all bookings elements
+        for (let i = 0; i < bookings.length; i++) {
+            let bookingObject = {};
+
+            // Fetching name and centre_name from User and VaccinationCentre database
+            const userData = await User.findById(bookings[i].userId, "name").exec();
+            const vaccinationCentreData = await VaccinationCentre.findById(bookings[i].centreId, "centre_name").exec();
+
+            // Adding all data into the object
+            bookingObject._id = bookings[i]._id;
+            bookingObject.name = userData.name;
+            bookingObject.centre_name = vaccinationCentreData.centre_name;
+            bookingObject.vaccine = bookings[i].vaccine;
+            bookingObject.paid = bookings[i].paid;
+            bookingObject.booking_date = bookings[i].createdAt;
+            bookingObject.approved = bookings[i].approved;
+            bookingObject.allotted_date = bookings[i].date;
+
+            // pushing element into the array
+            bookingData.push(bookingObject);
+        }
+
+        return res.status(200).json({ bookings: bookingData });
+    } catch (error) {
+        return res.status(400).json({ error: error });
+    }
+}
+
 // Complete bookings
 exports.approveBooking = async (req, res) => {
     try {

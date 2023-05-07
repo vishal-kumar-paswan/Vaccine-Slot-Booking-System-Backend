@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const { check } = require("express-validator");
-const { signin, signup } = require("../controllers/user");
+const { signin, signup, getAppointments } = require("../controllers/user");
 
 router.post("/signup",
     [
@@ -28,5 +28,7 @@ router.post("/signin",
     ],
     signin
 );
+
+router.get("/appointments/:userId", getAppointments);
 
 module.exports = router;
