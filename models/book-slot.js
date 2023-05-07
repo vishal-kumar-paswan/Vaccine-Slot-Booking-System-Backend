@@ -28,7 +28,7 @@ const bookSlotSchema = new mongoose.Schema({
         type: String,
         default: null
     }
-});
+}, { timestamps: true });
 
 // Defining bookSlotSchema methods
 bookSlotSchema.methods = {
