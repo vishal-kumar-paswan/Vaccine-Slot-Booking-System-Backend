@@ -124,7 +124,7 @@ exports.approveBooking = async (req, res) => {
         // If the approval is declined a mail and error message will be returned
         if (!approved) {
             bookingDeclinedMail(email, name);
-            return res.status(403).json({ error: "request declined by vaccination centre" });
+            return res.status(202).json({ error: "request declined by vaccination centre" });
         }
 
         // Since the approval is true, we'll be fetching the VaccineStock details from the database
